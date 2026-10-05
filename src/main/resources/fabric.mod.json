@@ -1,0 +1,44 @@
+{
+	"schemaVersion": 1,
+	"id": "pickaxesaver",
+	"version": "${version}",
+	"name": "PickaxeSaver",
+	"description": "This Mod Saves ur Pickaxe before Breaking",
+	"authors": [
+		"Mxc0"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "MIT",
+	"icon": "assets/pickaxesaver/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.k0.PickaxeSaver"
+		],
+		"client": [
+			"com.k0.client.PickaxeSaverClient"
+		],
+		"modmenu": [
+			"com.k0.client.PickaxeSaverModMenu"
+		]
+	},
+	"mixins": [
+		"pickaxesaver.mixins.json",
+		{
+			"config": "pickaxesaver.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.19.5",
+		"minecraft": "~1.21.11",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"modmenu": "*"
+	}
+}
