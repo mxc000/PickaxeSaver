@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class PickaxeSaverConfig {
+	public static final int MIN_DURABILITY_THRESHOLD = 1;
+	public static final int MAX_DURABILITY_THRESHOLD = 50;
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	private static final Path CONFIG_FILE = FabricLoader.getInstance().getConfigDir().resolve("pickaxesaver.json");
 	private static boolean enabled = true;
@@ -31,7 +33,7 @@ public final class PickaxeSaverConfig {
 			ConfigData loaded = GSON.fromJson(Files.readString(CONFIG_FILE), ConfigData.class);
 			if (loaded != null) {
 				enabled = loaded.enabled();
-				durabilityThreshold = Math.max(1, Math.min(50, loaded.durabilityThreshold()));
+				durabilityThreshold = clampThreshold(loaded.durabilityThreshold());
 				customItems.clear();
 				if (loaded.customItems() != null) customItems.addAll(loaded.customItems());
 			}
@@ -53,12 +55,16 @@ public final class PickaxeSaverConfig {
 	}
 
 	public static int getDurabilityThreshold() {
-		return durabilityThreshold;
+		return clampThreshold(durabilityThreshold);
 	}
 
 	public static void setDurabilityThreshold(int value) {
-		durabilityThreshold = Math.max(1, Math.min(50, value));
+		durabilityThreshold = clampThreshold(value);
 		save();
+	}
+
+	private static int clampThreshold(int value) {
+		return Math.max(MIN_DURABILITY_THRESHOLD, Math.min(MAX_DURABILITY_THRESHOLD, value));
 	}
 
 	public static List<String> getCustomItems() {

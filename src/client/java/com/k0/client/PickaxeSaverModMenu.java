@@ -20,6 +20,8 @@ public class PickaxeSaverModMenu implements ModMenuApi {
 		private final Screen parent;
 		private int selectedCustomItem;
 		private Button selectedItemButton;
+		private Button thresholdDownButton;
+		private Button thresholdUpButton;
 		private String feedback = "";
 
 		private PickaxeSaverConfigScreen(Screen parent) {
@@ -36,12 +38,15 @@ public class PickaxeSaverModMenu implements ModMenuApi {
 				button.setMessage(enabledLabel());
 			}).bounds(centerX - 110, firstY, 220, 20).build());
 
-			this.addRenderableWidget(Button.builder(Component.literal("-"), button -> {
+			this.thresholdDownButton = this.addRenderableWidget(Button.builder(Component.literal("-"), button -> {
 				PickaxeSaverConfig.setDurabilityThreshold(PickaxeSaverConfig.getDurabilityThreshold() - 1);
-			}).bounds(centerX - 110, firstY + 29, 24, 20).tooltip(net.minecraft.client.gui.components.Tooltip.create(Component.literal("Lower threshold"))).build());
-			this.addRenderableWidget(Button.builder(Component.literal("+"), button -> {
+				refreshThresholdButtons();
+			}).bounds(centerX - 110, firstY + 29, 24, 20).tooltip(net.minecraft.client.gui.components.Tooltip.create(Component.literal("Lower threshold (min " + PickaxeSaverConfig.MIN_DURABILITY_THRESHOLD + "%)"))).build());
+			this.thresholdUpButton = this.addRenderableWidget(Button.builder(Component.literal("+"), button -> {
 				PickaxeSaverConfig.setDurabilityThreshold(PickaxeSaverConfig.getDurabilityThreshold() + 1);
-			}).bounds(centerX + 86, firstY + 29, 24, 20).tooltip(net.minecraft.client.gui.components.Tooltip.create(Component.literal("Raise threshold"))).build());
+				refreshThresholdButtons();
+			}).bounds(centerX + 86, firstY + 29, 24, 20).tooltip(net.minecraft.client.gui.components.Tooltip.create(Component.literal("Raise threshold (max " + PickaxeSaverConfig.MAX_DURABILITY_THRESHOLD + "%)"))).build());
+			refreshThresholdButtons();
 
 			this.addRenderableWidget(Button.builder(Component.literal("+ Add held item"), button -> {
 				if (this.minecraft != null && this.minecraft.player != null) {
@@ -90,7 +95,8 @@ public class PickaxeSaverModMenu implements ModMenuApi {
 			super.render(graphics, mouseX, mouseY, partialTick);
 			int centerX = this.width / 2;
 			int firstY = this.height / 2 - 76;
-			graphics.drawCenteredString(this.font, Component.literal("Protect below " + PickaxeSaverConfig.getDurabilityThreshold() + "% durability"), centerX, firstY + 34, 0xFFFFFF);
+			int threshold = PickaxeSaverConfig.getDurabilityThreshold();
+			graphics.drawCenteredString(this.font, Component.literal("Protect below " + threshold + "% (" + PickaxeSaverConfig.MIN_DURABILITY_THRESHOLD + "-" + PickaxeSaverConfig.MAX_DURABILITY_THRESHOLD + "%)"), centerX, firstY + 34, 0xFFFFFF);
 			graphics.drawString(this.font, Component.literal("CUSTOM ITEMS"), centerX - 110, firstY + 44, 0xA0A0A0);
 			if (!feedback.isEmpty()) {
 				graphics.drawCenteredString(this.font, Component.literal(feedback), centerX, firstY + 112, 0xA0A0A0);
@@ -120,6 +126,12 @@ public class PickaxeSaverModMenu implements ModMenuApi {
 
 		private void refreshSelectedItemButton() {
 			this.selectedItemButton.setMessage(selectedItemLabel());
+		}
+
+		private void refreshThresholdButtons() {
+			int threshold = PickaxeSaverConfig.getDurabilityThreshold();
+			this.thresholdDownButton.active = threshold > PickaxeSaverConfig.MIN_DURABILITY_THRESHOLD;
+			this.thresholdUpButton.active = threshold < PickaxeSaverConfig.MAX_DURABILITY_THRESHOLD;
 		}
 	}
 }
